@@ -1,0 +1,57 @@
+Server code below
+
+[HttpGet]
+
+        [Route("download/{txt}")]
+
+        public async Task<IActionResult> Download(string txt)
+
+        {
+
+            var results = await GetResults(txt);
+
+ 
+
+            Stream stream = null;
+
+            using (var writer = new StringWriter())
+
+            using (var csv = new CsvWriter(writer))
+
+            {
+
+                csv.WriteRecords(results.Items);
+
+                stream = GenerateStreamFromString(writer.ToString());
+
+            }
+
+ 
+
+            if (stream == null)
+
+                return NotFound(); // returns a NotFoundResult with Status404NotFound response.
+
+ 
+
+            return File(stream, "application/csv"); // returns a FileStreamResult
+
+        }
+
+ 
+
+ 
+
+ 
+Client code below
+ 
+
+    getCsv(query:string): Observable<Blob> {   
+
+            let uri = this.baseUri + "/cn/download/" + query;
+
+            return this.http.get(uri, { responseType: 'blob' });
+
+        }
+
+ 
